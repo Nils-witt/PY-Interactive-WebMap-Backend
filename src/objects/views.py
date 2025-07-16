@@ -18,7 +18,17 @@ def export_view(request):
 
     if all:
         objs = ContentType.objects.get_for_id(int(content_type)).get_all_objects_for_this_type()
-        print(objs)
+        response = HttpResponse(content_type="application/json")
+        serializers.serialize("json", objs, stream=response)
+        return response
+    if ids:
+        ids = ids.split(',')
+        try:
+            ids = [int(id) for id in ids]
+        except ValueError:
+            return render(request, 'error.html', {'message': 'Invalid IDs'})
+
+        objs = ContentType.objects.get_for_id(int(content_type)).get_all_objects_for_this_type().filter(id__in=ids)
         response = HttpResponse(content_type="application/json")
         serializers.serialize("json", objs, stream=response)
         return response
