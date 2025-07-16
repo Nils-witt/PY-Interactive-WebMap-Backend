@@ -8,8 +8,6 @@ services:
       POSTGRES_DB: 'drk_core'
       POSTGRES_USER: 'drk_core'
       POSTGRES_PASSWORD: 'drk_core'
-    ports:
-        - '5432:5432'
 
   django:
     restart: unless-stopped
