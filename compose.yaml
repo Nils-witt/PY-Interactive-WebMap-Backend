@@ -3,7 +3,7 @@ services:
     restart: unless-stopped
     image: postgres:17
     volumes:
-      - database:/var/lib/postgresql/data
+      - ./data/database:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: 'drk_core'
       POSTGRES_USER: 'drk_core'
