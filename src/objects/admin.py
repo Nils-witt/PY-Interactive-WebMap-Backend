@@ -2,11 +2,10 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
 
-from objects.models import MapObject, MapGroup, MapOverlay, MapStyle
+from objects.models import MapObject, MapGroup, MapOverlay, MapStyle, MapIcon
 
 
 # Register your models here.
-
 
 
 class MapObjectAdmin(admin.ModelAdmin):
@@ -20,8 +19,10 @@ class MapObjectAdmin(admin.ModelAdmin):
     def set_zoom_18(self, request, queryset):
         queryset.update(zoom=18)
 
+
 admin.site.register(MapObject, MapObjectAdmin)
 admin.site.register(MapGroup)
+
 
 class MapOverlayAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'url', 'type')
@@ -31,7 +32,7 @@ class MapOverlayAdmin(admin.ModelAdmin):
     actions = ["export_all_objects"]
 
     def export_all_objects(modeladmin, request, queryset):
-        #elected = queryset.values_list("pk", flat=True)
+        # elected = queryset.values_list("pk", flat=True)
         ct = ContentType.objects.get_for_model(queryset.model)
         return HttpResponseRedirect(
             "/export/?ct=%s&all=true"
@@ -40,7 +41,9 @@ class MapOverlayAdmin(admin.ModelAdmin):
             )
         )
 
+
 admin.site.register(MapOverlay, MapOverlayAdmin)
+
 
 class MapStyleAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'url')
@@ -60,4 +63,17 @@ class MapStyleAdmin(admin.ModelAdmin):
             )
         )
 
+
 admin.site.register(MapStyle, MapStyleAdmin)
+
+
+class MapIconAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+    list_filter = ('created_at', 'updated_at')
+
+    def icon(self, obj):
+        return obj.icon.get('icon', {}).get('url', 'No Icon')
+
+
+admin.site.register(MapIcon, MapIconAdmin)

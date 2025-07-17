@@ -19,8 +19,8 @@ from django.urls import path, include
 from rest_framework import viewsets, routers, permissions
 
 import objects.views
-from objects.models import MapObject, MapOverlay, MapStyle
-from objects.serializers import MapObjectSerializer, MapOverlaySerializer, MapStyleSerializer
+from objects.models import MapObject, MapOverlay, MapStyle, MapIcon
+from objects.serializers import MapObjectSerializer, MapOverlaySerializer, MapStyleSerializer, MapIconSerializer
 
 
 class MapObjectViewSet(viewsets.ModelViewSet):
@@ -41,10 +41,17 @@ class MapStyleViewSet(viewsets.ModelViewSet):
     serializer_class = MapStyleSerializer
 
 
+class MapIconViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = MapIcon.objects.all()
+    serializer_class = MapIconSerializer
+
+
 router = routers.DefaultRouter()
 router.register(r'mapobjects', MapObjectViewSet)
 router.register(r'overlays', MapOverlayViewSet)
 router.register(r'styles', MapStyleViewSet)
+router.register(r'mapicons', MapIconViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
