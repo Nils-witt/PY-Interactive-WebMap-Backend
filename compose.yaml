@@ -25,6 +25,8 @@ services:
       - db
     volumes:
       - staticfiles:/code/staticfiles/
+    env_file:
+      - .env
 
   nginx:
     restart: unless-stopped
