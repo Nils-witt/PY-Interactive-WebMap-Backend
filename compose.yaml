@@ -25,6 +25,7 @@ services:
       - db
     volumes:
       - staticfiles:/code/staticfiles/
+      - ./fixtures:/fixtures
     env_file:
       - .env
 
@@ -43,4 +44,4 @@ services:
 
 volumes:
   staticfiles:
-  database:
+
