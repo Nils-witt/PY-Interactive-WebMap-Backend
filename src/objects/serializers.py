@@ -30,4 +30,4 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class NamedGeoReferencedItemSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = NamedGeoReferencedItem
-        fields = '__all__'
+        fields = ['url', 'id', 'name', 'latitude', 'longitude', 'zoom_level', 'show_on_map', 'group', 'symbol', 'created_at', 'updated_at', 'description']
