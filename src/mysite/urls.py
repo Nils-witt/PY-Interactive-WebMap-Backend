@@ -51,7 +51,7 @@ router = routers.DefaultRouter()
 router.register(r'mapobjects', MapObjectViewSet)
 router.register(r'overlays', MapOverlayViewSet)
 router.register(r'styles', MapStyleViewSet)
-router.register(r'mapicons', MapIconViewSet)
+router.register(r'map_items', MapIconViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
