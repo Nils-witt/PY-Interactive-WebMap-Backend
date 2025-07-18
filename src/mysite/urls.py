@@ -21,7 +21,10 @@ from rest_framework import viewsets, routers, permissions
 import objects.views
 from objects.models import MapObject, MapOverlay, MapStyle, MapIcon
 from objects.serializers import MapObjectSerializer, MapOverlaySerializer, MapStyleSerializer, MapIconSerializer
-
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView, TokenVerifyView,
+)
 
 class MapObjectViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -54,6 +57,11 @@ router.register(r'styles', MapStyleViewSet)
 router.register(r'map_items', MapIconViewSet)
 
 urlpatterns = [
+
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
 
