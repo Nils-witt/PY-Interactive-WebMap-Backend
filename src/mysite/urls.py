@@ -14,14 +14,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.models import User
 from django.urls import path, include
 from rest_framework import viewsets, routers, permissions
 
 import objects.views
-from objects.models import MapOverlay, MapStyle, NamedGeoReferencedItem
+from objects.models import MapOverlay, MapStyle, NamedGeoReferencedItem, MapGroup
 from objects.serializers import MapOverlaySerializer, MapStyleSerializer, \
-     NamedGeoReferencedItemSerializer
+    NamedGeoReferencedItemSerializer, MapGroupSerializer, UserSerializer
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView, TokenVerifyView,
@@ -44,11 +46,23 @@ class NamedGeoReferencedItemViewSet(viewsets.ModelViewSet):
     queryset = NamedGeoReferencedItem.objects.all()
     serializer_class = NamedGeoReferencedItemSerializer
 
+class MapGroupSerializerViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = MapGroup.objects.all()
+    serializer_class = MapGroupSerializer
+
+class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
 
 router = routers.DefaultRouter()
 router.register(r'overlays', MapOverlayViewSet)
 router.register(r'styles', MapStyleViewSet)
 router.register(r'items', NamedGeoReferencedItemViewSet)
+router.register(r'map_groups', MapGroupSerializerViewSet)
+router.register(r'users', UserViewSet)
 
 urlpatterns = [
 
