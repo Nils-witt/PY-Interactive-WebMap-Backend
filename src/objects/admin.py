@@ -2,25 +2,11 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
 
-from objects.models import MapObject, MapGroup, MapOverlay, MapStyle, MapIcon
+from objects.models import  MapGroup, MapOverlay, MapStyle, NamedGeoReferencedItem
 
 
 # Register your models here.
 
-
-class MapObjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'longitude', 'latitude', 'zoom')
-    search_fields = ('name', 'description')
-    list_filter = ('created_at', 'updated_at', 'groups')
-
-    actions = ["set_zoom_18"]
-
-    @admin.action()
-    def set_zoom_18(self, request, queryset):
-        queryset.update(zoom=18)
-
-
-admin.site.register(MapObject, MapObjectAdmin)
 admin.site.register(MapGroup)
 
 
@@ -67,13 +53,9 @@ class MapStyleAdmin(admin.ModelAdmin):
 admin.site.register(MapStyle, MapStyleAdmin)
 
 
-class MapIconAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+class NamedGeoReferencedItemAdmin(admin.ModelAdmin):
+    list_display = ('name', 'longitude', 'latitude')
     search_fields = ('name',)
     list_filter = ('created_at', 'updated_at')
 
-    def icon(self, obj):
-        return obj.icon.get('icon', {}).get('url', 'No Icon')
-
-
-admin.site.register(MapIcon, MapIconAdmin)
+admin.site.register(NamedGeoReferencedItem, NamedGeoReferencedItemAdmin)

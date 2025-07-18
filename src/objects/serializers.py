@@ -1,12 +1,6 @@
 from rest_framework import serializers
 
-from objects.models import MapObject, MapOverlay, MapStyle, MapIcon
-
-
-class MapObjectSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = MapObject
-        fields = ['url', 'id', 'name', 'description', 'longitude', 'latitude', 'zoom']
+from objects.models import MapOverlay, MapStyle, NamedGeoReferencedItem
 
 
 class MapOverlaySerializer(serializers.HyperlinkedModelSerializer):
@@ -21,9 +15,7 @@ class MapStyleSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'id', 'name', 'description', 'url']
 
 
-class MapIconSerializer(serializers.HyperlinkedModelSerializer):
+class NamedGeoReferencedItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MapIcon
-        fields = ['url', 'id', 'name', 'latitude', 'longitude', "grundzeichen", "organisation", "fachaufgabe",
-                  "einheit", "verwaltungsstufe", "funktion", "symbol", "text", "typ", "icon_name", "organisation_name",
-                  "farbe"]
+        model = NamedGeoReferencedItem
+        fields = '__all__'

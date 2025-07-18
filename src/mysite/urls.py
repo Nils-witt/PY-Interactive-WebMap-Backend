@@ -19,18 +19,13 @@ from django.urls import path, include
 from rest_framework import viewsets, routers, permissions
 
 import objects.views
-from objects.models import MapObject, MapOverlay, MapStyle, MapIcon
-from objects.serializers import MapObjectSerializer, MapOverlaySerializer, MapStyleSerializer, MapIconSerializer
+from objects.models import MapOverlay, MapStyle, NamedGeoReferencedItem
+from objects.serializers import MapOverlaySerializer, MapStyleSerializer, \
+     NamedGeoReferencedItemSerializer
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView, TokenVerifyView,
 )
-
-class MapObjectViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = MapObject.objects.all()
-    serializer_class = MapObjectSerializer
-
 
 class MapOverlayViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -44,17 +39,16 @@ class MapStyleViewSet(viewsets.ModelViewSet):
     serializer_class = MapStyleSerializer
 
 
-class MapIconViewSet(viewsets.ModelViewSet):
+class NamedGeoReferencedItemViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    queryset = MapIcon.objects.all()
-    serializer_class = MapIconSerializer
+    queryset = NamedGeoReferencedItem.objects.all()
+    serializer_class = NamedGeoReferencedItemSerializer
 
 
 router = routers.DefaultRouter()
-router.register(r'mapobjects', MapObjectViewSet)
 router.register(r'overlays', MapOverlayViewSet)
 router.register(r'styles', MapStyleViewSet)
-router.register(r'map_items', MapIconViewSet)
+router.register(r'items', NamedGeoReferencedItemViewSet)
 
 urlpatterns = [
 
@@ -64,6 +58,4 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-
-    path('export/', objects.views.export_view),  # Assuming export_view is defined in objects.urls
 ]
