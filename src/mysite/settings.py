@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +42,7 @@ ROOT_URLCONF = 'mysite.urls'
 
 TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates', 'DIRS': [], 'APP_DIRS': True, 'OPTIONS': {
     'context_processors': ['django.template.context_processors.request', 'django.contrib.auth.context_processors.auth',
-        'django.contrib.messages.context_processors.messages', ], }, }, ]
+                           'django.contrib.messages.context_processors.messages', ], }, }, ]
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
@@ -110,4 +111,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
 }

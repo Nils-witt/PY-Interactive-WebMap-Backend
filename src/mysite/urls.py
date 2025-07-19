@@ -42,7 +42,7 @@ class MapStyleViewSet(viewsets.ModelViewSet):
 
 
 class NamedGeoReferencedItemViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = NamedGeoReferencedItem.objects.all()
     serializer_class = NamedGeoReferencedItemSerializer
 
@@ -52,7 +52,7 @@ class MapGroupSerializerViewSet(viewsets.ModelViewSet):
     serializer_class = MapGroupSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.AllowAny]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -65,11 +65,11 @@ router.register(r'map_groups', MapGroupSerializerViewSet)
 router.register(r'users', UserViewSet)
 
 urlpatterns = [
-
+    path('api/', include(router.urls)),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
+
 ]
