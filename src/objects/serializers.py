@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -20,14 +19,17 @@ class MapStyleSerializer(serializers.HyperlinkedModelSerializer):
 class MapGroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MapGroup
-        fields = '__all__'
+        fields = ['url', 'id', 'name', 'description']
+
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ['url', 'id', 'username']
 
+
 class NamedGeoReferencedItemSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = NamedGeoReferencedItem
-        fields = ['url', 'id', 'name', 'latitude', 'longitude', 'zoom_level', 'show_on_map', 'group', 'symbol', 'created_at', 'updated_at', 'description']
+        fields = ['url', 'id', 'name', 'latitude', 'longitude', 'zoom_level', 'show_on_map', 'group', 'group_id',
+                  'symbol', 'created_at', 'updated_at', 'description']
