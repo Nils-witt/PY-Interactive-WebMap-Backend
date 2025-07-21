@@ -29,31 +29,31 @@ from objects.serializers import MapOverlaySerializer, MapStyleSerializer, \
 
 
 class MapOverlayViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = MapOverlay.objects.all()
     serializer_class = MapOverlaySerializer
 
 
 class MapStyleViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = MapStyle.objects.all()
     serializer_class = MapStyleSerializer
 
 
 class NamedGeoReferencedItemViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = NamedGeoReferencedItem.objects.all()
     serializer_class = NamedGeoReferencedItemSerializer
 
 
 class MapGroupSerializerViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = MapGroup.objects.all()
     serializer_class = MapGroupSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
