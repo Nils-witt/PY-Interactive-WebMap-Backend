@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'guardian',
 
     'objects',
 ]
@@ -70,6 +71,11 @@ DATABASES = {
         "PORT": os.getenv('DB_PORT', '5432'),
     }
 }
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

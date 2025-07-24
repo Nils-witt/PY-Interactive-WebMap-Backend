@@ -5,13 +5,14 @@ from django.http import HttpResponseRedirect
 from objects.models import MapGroup, MapOverlay, MapStyle, NamedGeoReferencedItem
 from django.contrib.admin.helpers import ActionForm
 from django import forms
+from guardian.admin import GuardedModelAdmin
 
 # Register your models here.
 
 admin.site.register(MapGroup)
 
 
-class MapOverlayAdmin(admin.ModelAdmin):
+class MapOverlayAdmin(GuardedModelAdmin):
     list_display = ('name', 'description', 'url', 'type')
     search_fields = ('name', 'description')
     list_filter = ('created_at', 'updated_at')
@@ -32,7 +33,7 @@ class MapOverlayAdmin(admin.ModelAdmin):
 admin.site.register(MapOverlay, MapOverlayAdmin)
 
 
-class MapStyleAdmin(admin.ModelAdmin):
+class MapStyleAdmin(GuardedModelAdmin):
     list_display = ('name', 'description', 'url')
     search_fields = ('name', 'description')
     list_filter = ('created_at', 'updated_at')
@@ -53,14 +54,11 @@ class MapStyleAdmin(admin.ModelAdmin):
 
 admin.site.register(MapStyle, MapStyleAdmin)
 
-
-
-
 class XForm(ActionForm):
     zoom_level = forms.IntegerField(required=False)
 
 
-class NamedGeoReferencedItemAdmin(admin.ModelAdmin):
+class NamedGeoReferencedItemAdmin(GuardedModelAdmin):
     list_display = ('name', 'longitude', 'latitude', 'zoom_level', 'show_on_map', 'group', 'created_at', 'updated_at')
     search_fields = ('name',)
     list_filter = ('created_at', 'updated_at', 'group', 'show_on_map', 'zoom_level')

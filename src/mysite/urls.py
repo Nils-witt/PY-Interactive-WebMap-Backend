@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.urls import path, include
+from guardian.shortcuts import get_objects_for_user
 from rest_framework import viewsets, routers, permissions
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -28,10 +29,24 @@ from objects.serializers import MapOverlaySerializer, MapStyleSerializer, \
     NamedGeoReferencedItemSerializer, MapGroupSerializer, UserSerializer
 
 
+class HasViewPermissions(permissions.BasePermission):
+    """
+    Object-level permission to only allow owners of an object to edit it.
+    Assumes the model instance has an `owner` attribute.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return False
+
+
 class MapOverlayViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = MapOverlay.objects.all()
     serializer_class = MapOverlaySerializer
+
+    def get_queryset(self):
+        query_set = get_objects_for_user(self.request.user, 'objects.view_mapoverlay')
+        return query_set
 
 
 class MapStyleViewSet(viewsets.ModelViewSet):
@@ -39,11 +54,19 @@ class MapStyleViewSet(viewsets.ModelViewSet):
     queryset = MapStyle.objects.all()
     serializer_class = MapStyleSerializer
 
+    def get_queryset(self):
+        query_set = get_objects_for_user(self.request.user, 'objects.view_mapstyle')
+        return query_set
+
 
 class NamedGeoReferencedItemViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [HasViewPermissions]
     queryset = NamedGeoReferencedItem.objects.all()
     serializer_class = NamedGeoReferencedItemSerializer
+
+    def get_queryset(self):
+        query_set = get_objects_for_user(self.request.user, 'objects.view_namedgeoreferenceditem')
+        return query_set
 
 
 class MapGroupSerializerViewSet(viewsets.ModelViewSet):
@@ -51,11 +74,19 @@ class MapGroupSerializerViewSet(viewsets.ModelViewSet):
     queryset = MapGroup.objects.all()
     serializer_class = MapGroupSerializer
 
+    def get_queryset(self):
+        query_set = get_objects_for_user(self.request.user, 'objects.view_mapgroup')
+        return query_set
+
 
 class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def get_queryset(self):
+        query_set = get_objects_for_user(self.request.user, 'objects.view_user')
+        return query_set
 
 
 router = routers.DefaultRouter()
