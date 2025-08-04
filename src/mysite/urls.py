@@ -29,18 +29,20 @@ from objects.serializers import MapOverlaySerializer, MapStyleSerializer, \
     NamedGeoReferencedItemSerializer, MapGroupSerializer, UserSerializer
 
 
-class HasViewPermissions(permissions.BasePermission):
+class HasApiPermissions(permissions.BasePermission):
     """
     Object-level permission to only allow owners of an object to edit it.
     Assumes the model instance has an `owner` attribute.
     """
 
     def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser:
+            return True
         return False
 
 
 class MapOverlayViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [HasApiPermissions]
     queryset = MapOverlay.objects.all()
     serializer_class = MapOverlaySerializer
 
@@ -50,7 +52,7 @@ class MapOverlayViewSet(viewsets.ModelViewSet):
 
 
 class MapStyleViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [HasApiPermissions]
     queryset = MapStyle.objects.all()
     serializer_class = MapStyleSerializer
 
@@ -60,17 +62,19 @@ class MapStyleViewSet(viewsets.ModelViewSet):
 
 
 class NamedGeoReferencedItemViewSet(viewsets.ModelViewSet):
-    permission_classes = [HasViewPermissions]
+    permission_classes = [HasApiPermissions]
     queryset = NamedGeoReferencedItem.objects.all()
     serializer_class = NamedGeoReferencedItemSerializer
 
     def get_queryset(self):
         query_set = get_objects_for_user(self.request.user, 'objects.view_namedgeoreferenceditem')
+        print(query_set)
+        print(self.request.user)
         return query_set
 
 
 class MapGroupSerializerViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [HasApiPermissions]
     queryset = MapGroup.objects.all()
     serializer_class = MapGroupSerializer
 
@@ -80,7 +84,7 @@ class MapGroupSerializerViewSet(viewsets.ModelViewSet):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [HasApiPermissions]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
