@@ -18,4 +18,5 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
                 token['overlays'].append(overlay.permission_name)
 
         token['is_superuser'] = user.is_superuser
+        token['view_all'] = user.is_superuser or user.has_perm('objects.view_mapoverlay')
         return token

@@ -1,0 +1,49 @@
+services:
+  db:
+    restart: unless-stopped
+    image: postgres:17
+    volumes:
+      - ./data/database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: 'drk_core'
+      POSTGRES_USER: 'drk_core'
+      POSTGRES_PASSWORD: 'drk_core'
+    ports:
+      - '5432:5432'
+
+  django:
+    restart: unless-stopped
+    # image: ghcr.io/nils-witt/drk-core:latest
+    build: .
+    environment:
+      DB_HOST: 'db'
+      DB_NAME: 'drk_core'
+      DB_USER: 'drk_core'
+      DB_PASSWORD: 'drk_core'
+      DB_PORT: '5432'
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+      - staticfiles:/code/staticfiles/
+      - ./fixtures:/fixtures
+    env_file:
+      - .env
+
+  nginx:
+    restart: unless-stopped
+    image: nginx
+    ports:
+      - '8083:80'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - staticfiles:/usr/share/nginx/html/static
+    links:
+      - django
+    depends_on:
+      - django
+
+volumes:
+  staticfiles:
+
