@@ -24,6 +24,8 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView, TokenVerifyView,
 )
 
+from mysite import settings
+from objects import views
 from objects.models import MapOverlay, MapStyle, NamedGeoReferencedItem, MapGroup
 from objects.serializers import MapOverlaySerializer, MapStyleSerializer, \
     NamedGeoReferencedItemSerializer, MapGroupSerializer, UserSerializer
@@ -119,3 +121,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
 ]
+
+if settings.DEBUG:
+    urlpatterns.append(path('test/', views.test, name='test'))
