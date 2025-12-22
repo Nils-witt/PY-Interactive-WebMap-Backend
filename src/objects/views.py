@@ -5,5 +5,4 @@ from django.http import HttpResponse
 
 
 def test(request):
-    print(request.user.has_perm('objects.view_mapoverlay'))
     return HttpResponse("Hello World")

@@ -80,8 +80,6 @@ class NamedGeoReferencedItemViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         query_set = get_objects_for_user(self.request.user, 'objects.view_namedgeoreferenceditem')
-        print(query_set)
-        print(self.request.user)
         return query_set
 
 
@@ -101,7 +99,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        query_set = get_objects_for_user(self.request.user, 'objects.view_user')
+        query_set = get_objects_for_user(self.request.user, 'auth.view_user')
         return query_set
 
 

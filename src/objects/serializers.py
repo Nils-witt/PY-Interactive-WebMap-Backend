@@ -25,7 +25,7 @@ class MapGroupSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'id', 'username']
+        fields = ['url', 'id', 'username', 'email', 'is_staff', 'is_superuser', 'is_active', 'date_joined', 'last_login', 'first_name', 'last_name']
 
 
 class NamedGeoReferencedItemSerializer(serializers.HyperlinkedModelSerializer):
