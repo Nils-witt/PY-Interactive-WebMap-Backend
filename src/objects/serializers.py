@@ -4,32 +4,53 @@ from rest_framework import serializers
 from objects.models import MapOverlay, MapStyle, NamedGeoReferencedItem, MapGroup
 
 
-class MapOverlaySerializer(serializers.HyperlinkedModelSerializer):
+class MapOverlaySerializerWS(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MapOverlay
-        fields = ['url', 'id', 'name', 'description', 'url', 'type']
+        fields = ['id', 'name', 'description', 'url', 'type']
 
+class MapOverlaySerializer(MapOverlaySerializerWS):
+    class Meta:
+        model = MapOverlay
+        fields = MapOverlaySerializerWS.Meta.fields + ['url']
 
-class MapStyleSerializer(serializers.HyperlinkedModelSerializer):
+class MapStyleSerializerWS(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MapStyle
-        fields = ['url', 'id', 'name', 'description', 'url']
+        fields = ['id', 'name', 'description', 'url']
 
+class MapStyleSerializer(MapStyleSerializerWS):
+    class Meta:
+        model = MapStyle
+        fields = MapStyleSerializerWS.Meta.fields + ['url']
 
-class MapGroupSerializer(serializers.HyperlinkedModelSerializer):
+class MapGroupSerializerWS(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MapGroup
-        fields = ['url', 'id', 'name', 'description']
+        fields = ['id', 'name', 'description']
 
+class MapGroupSerializer(MapGroupSerializerWS):
+    class Meta:
+        model = MapGroup
+        fields = MapGroupSerializerWS.Meta.fields + ['url']
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializerWS(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'id', 'username', 'email', 'is_staff', 'is_superuser', 'is_active', 'date_joined', 'last_login', 'first_name', 'last_name']
+        fields = ['id', 'username', 'email', 'is_staff', 'is_superuser', 'is_active', 'date_joined', 'last_login', 'first_name', 'last_name']
 
+class UserSerializer(UserSerializerWS):
+    class Meta:
+        model = User
+        fields = UserSerializerWS.Meta.fields + ['url']
 
-class NamedGeoReferencedItemSerializer(serializers.HyperlinkedModelSerializer):
+class NamedGeoReferencedItemSerializerWS(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = NamedGeoReferencedItem
-        fields = ['url', 'id', 'name', 'latitude', 'longitude', 'zoom_level', 'show_on_map', 'group', 'group_id',
+        fields = ['id', 'name', 'latitude', 'longitude', 'zoom_level', 'show_on_map', 'group', 'group_id',
                   'symbol', 'created_at', 'updated_at', 'description']
+
+class NamedGeoReferencedItemSerializer(NamedGeoReferencedItemSerializerWS):
+    class Meta:
+        model = NamedGeoReferencedItem
+        fields = NamedGeoReferencedItemSerializerWS.Meta.fields + ['url']
