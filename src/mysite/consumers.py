@@ -43,19 +43,33 @@ class MyConsumer(WebsocketConsumer):
         pass
 
     def model_update(self, event):
-        if event["model_type"] == MapGroup:
+        model = event["model_type"]
+        if model == MapGroup:
             instance = MapGroupSerializerWS(event['object'])
-        elif event["model_type"] == MapStyle:
+        elif model == MapStyle:
             instance = MapStyleSerializerWS(event['object'])
-        elif event["model_type"] == MapOverlay:
+        elif model == MapOverlay:
             instance = MapOverlaySerializerWS(event['object'])
-        elif event["model_type"] == NamedGeoReferencedItem:
+        elif model == NamedGeoReferencedItem:
             instance = NamedGeoReferencedItemSerializerWS(event['object'])
         else:
             instance = {'error': 'Unknown model type'}
 
-        self.send(text_data=json.dumps({
-            'model_type': event["model_type"].__name__,
-            'data': instance.data,
-            'sender': 'system'
-        }))
+
+        if self.user.has_perm(f'{model._meta.app_label}.view_{model._meta.model_name}'):
+            self.send(text_data=json.dumps({
+                'event': 'model.update',
+                'model_type': model.__name__,
+                'data': instance.data,
+                'sender': 'system'
+            }))
+
+    def model_delete(self, event):
+        model = event["model_type"]
+        if self.user.has_perm(f'{model._meta.app_label}.view_{model._meta.model_name}'):
+            self.send(text_data=json.dumps({
+                'event': 'model.delete',
+                'model_type': model.__name__,
+                'object_id': str(event['object_id']),
+                'sender': 'system'
+            }))
