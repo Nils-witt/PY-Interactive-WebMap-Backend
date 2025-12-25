@@ -1,7 +1,11 @@
 import uuid
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import models
+
+channel_layer = get_channel_layer()
 
 
 # Create your models here.
@@ -39,6 +43,11 @@ class MapGroup(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        async_to_sync(channel_layer.group_send)("chat",
+                                                {"type": "model.update", "model_type": type(self), 'object': self})
+
 
 class GeoReferencedMixin(models.Model):
     """
@@ -62,6 +71,11 @@ class MapStyle(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        async_to_sync(channel_layer.group_send)("chat",
+                                                {"type": "model.update", "model_type": type(self), 'object': self})
+
 
 class MapOverlay(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -72,6 +86,11 @@ class MapOverlay(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        async_to_sync(channel_layer.group_send)("chat",
+                                                {"type": "model.update", "model_type": type(self), 'object': self})
 
 
 class NamedGeoReferencedItem(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models.Model):
@@ -84,3 +103,8 @@ class NamedGeoReferencedItem(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoRefer
 
     def __str__(self):
         return self.name
+
+    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        async_to_sync(channel_layer.group_send)("chat",
+                                                {"type": "model.update", "model_type": type(self), 'object': self})
