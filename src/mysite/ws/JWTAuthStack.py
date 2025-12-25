@@ -30,7 +30,9 @@ class JWTAuthMiddleware:
         close_old_connections()
         try:
             # Decode the query string and get token parameter from it.
-            token = linear_search(scope["headers"], b'bearer')
+            token = linear_search(scope["headers"], b'authorization')
+            if token.startswith(b'Bearer '):
+                token = token[7:]
 
             # Decode the token to get the user id from it.
             data = jwt_decode(token, settings.SECRET_KEY, algorithms=["HS512"])
