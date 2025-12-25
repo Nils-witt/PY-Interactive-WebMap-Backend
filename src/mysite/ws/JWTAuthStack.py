@@ -15,7 +15,7 @@ User = get_user_model()
 def linear_search(data, target):
     for tup in data:
         if tup[0] == target:
-            return tup[1]
+            return str(tup[1])
     return None
 
 class JWTAuthMiddleware:
@@ -31,15 +31,22 @@ class JWTAuthMiddleware:
         try:
             # Decode the query string and get token parameter from it.
             token = linear_search(scope["headers"], b'authorization')
-            if token.startswith(b'Bearer '):
-                token = token[7:]
+
+            if token is None:
+                query_string = parse_qs(scope['query_string'].decode())
+                token = query_string.get('token', [None])[0]
+
+            if token is None:
+                raise AttributeError("No token found")
+            if token.startswith("b'Bearer "):
+                token = token[9:]
 
             # Decode the token to get the user id from it.
             data = jwt_decode(token, settings.SECRET_KEY, algorithms=["HS512"])
 
             # Get the user from database based on user id and add it to the scope.
             scope['user'] = await self.get_user(user_id=data['user_id'])
-        except (TypeError, KeyError, InvalidSignatureError, ExpiredSignatureError, DecodeError):
+        except (TypeError, KeyError, InvalidSignatureError, ExpiredSignatureError, DecodeError, AttributeError):
             # Set the user to Anonymous if token is not valid or expired.
             scope['user'] = AnonymousUser()
         return await self.app(scope, receive, send)
