@@ -2,6 +2,8 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from django.conf.global_settings import INSTALLED_APPS
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'sdfshjdfoisdjfj9w03ur**``$("§U$)JFsdfshjdfoisdjfj9w03ur**``$("§U$)JF')
@@ -10,9 +12,14 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost 127.0.0.1').split(' ')
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost:3000').split(' ')
-INSTALLED_APPS = [
-    'daphne',
+INSTALLED_APPS = []
 
+if DEBUG:
+    INSTALLED_APPS += [
+        'daphne',
+    ]
+
+INSTALLED_APPS += [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -25,7 +32,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'guardian',
     'channels',
-
     'objects',
 ]
 
