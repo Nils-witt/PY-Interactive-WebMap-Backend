@@ -12,4 +12,4 @@ sleep 2
 python manage.py collectstatic --no-input
 python manage.py migrate --no-input
 
-daphne mysite.asgi:application -b 0.0.0.0:8000
+daphne mysite.asgi:application -b 0.0.0.0
