@@ -75,8 +75,8 @@ class NamedGeoReferencedItemAdmin(GuardedModelAdmin):
 admin.site.register(NamedGeoReferencedItem, NamedGeoReferencedItemAdmin)
 
 class UnitAdmin(GuardedModelAdmin):
-    list_display = ('name', 'longitude', 'latitude', 'show_on_map', 'created_at', 'updated_at')
+    list_display = ('name', 'longitude', 'latitude', 'created_at', 'updated_at')
     search_fields = ('name',)
-    list_filter = ('created_at', 'updated_at', 'show_on_map')
+    list_filter = ('created_at', 'updated_at')
 
 admin.site.register(Unit, UnitAdmin)
