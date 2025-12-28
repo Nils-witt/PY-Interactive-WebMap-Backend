@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
 
-from objects.models import MapGroup, MapOverlay, MapStyle, NamedGeoReferencedItem
+from objects.models import MapGroup, MapOverlay, MapStyle, NamedGeoReferencedItem, Unit
 from django.contrib.admin.helpers import ActionForm
 from django import forms
 from guardian.admin import GuardedModelAdmin
@@ -73,3 +73,10 @@ class NamedGeoReferencedItemAdmin(GuardedModelAdmin):
             queryset.update(zoom_level=zoom_level)
             self.message_user(request, f"Zoom level set to {zoom_level} for selected items.")
 admin.site.register(NamedGeoReferencedItem, NamedGeoReferencedItemAdmin)
+
+class UnitAdmin(GuardedModelAdmin):
+    list_display = ('name', 'longitude', 'latitude', 'show_on_map', 'created_at', 'updated_at')
+    search_fields = ('name',)
+    list_filter = ('created_at', 'updated_at', 'show_on_map')
+
+admin.site.register(Unit, UnitAdmin)

@@ -26,9 +26,9 @@ from rest_framework_simplejwt.views import (
 
 from mysite import settings
 from objects import views
-from objects.models import MapOverlay, MapStyle, NamedGeoReferencedItem, MapGroup
+from objects.models import MapOverlay, MapStyle, NamedGeoReferencedItem, MapGroup, Unit
 from objects.serializers import MapOverlaySerializer, MapStyleSerializer, \
-    NamedGeoReferencedItemSerializer, MapGroupSerializer, UserSerializer
+    NamedGeoReferencedItemSerializer, MapGroupSerializer, UserSerializer, UnitSerializer
 
 
 class HasApiPermissions(permissions.BasePermission):
@@ -82,6 +82,14 @@ class NamedGeoReferencedItemViewSet(viewsets.ModelViewSet):
         query_set = get_objects_for_user(self.request.user, 'objects.view_namedgeoreferenceditem')
         return query_set
 
+class UnitViewSet(viewsets.ModelViewSet):
+    permission_classes = [HasApiPermissions]
+    queryset = Unit.objects.all()
+    serializer_class = UnitSerializer
+
+    def get_queryset(self):
+        query_set = get_objects_for_user(self.request.user, 'objects.view_unit')
+        return query_set
 
 class MapGroupSerializerViewSet(viewsets.ModelViewSet):
     permission_classes = [HasApiPermissions]
@@ -109,6 +117,7 @@ router.register(r'styles', MapStyleViewSet)
 router.register(r'items', NamedGeoReferencedItemViewSet)
 router.register(r'map_groups', MapGroupSerializerViewSet)
 router.register(r'users', UserViewSet)
+router.register(r'units', UnitViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),

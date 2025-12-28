@@ -4,9 +4,9 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django.conf import settings
 
-from objects.models import MapOverlay, MapGroup, NamedGeoReferencedItem, MapStyle
+from objects.models import MapOverlay, MapGroup, NamedGeoReferencedItem, MapStyle, Unit
 from objects.serializers import NamedGeoReferencedItemSerializerWS, MapGroupSerializerWS, MapStyleSerializerWS, \
-    MapOverlaySerializerWS
+    MapOverlaySerializerWS, UnitWS
 
 
 class MyConsumer(WebsocketConsumer):
@@ -74,6 +74,8 @@ class MyConsumer(WebsocketConsumer):
             instance = MapOverlaySerializerWS(event['object'])
         elif model == NamedGeoReferencedItem:
             instance = NamedGeoReferencedItemSerializerWS(event['object'])
+        elif model == Unit:
+            instance = UnitWS(event['object'])
         else:
             instance = {'error': 'Unknown model type'}
 
@@ -105,18 +107,14 @@ class MyConsumer(WebsocketConsumer):
             'sender': 'system'
         }))
 
-        if model_name == "NamedGeoReferencedItem":
-            instance = NamedGeoReferencedItem.objects.get(id=object_id)
+        if model_name == "Unit":
+            instance = Unit.objects.get(id=object_id)
             if 'name' in data.keys():
                 instance.name = data['name']
             if 'latitude' in data.keys():
                 instance.latitude = data['latitude']
             if 'longitude' in data.keys():
                 instance.longitude = data['longitude']
-            if 'zoom_level' in data.keys():
-                instance.zoom_level = data['zoom_level']
-            if 'show_on_map' in data.keys():
-                instance.show_on_map = data['show_on_map']
             if 'description' in data.keys():
                 instance.description = data['description']
             instance.save()

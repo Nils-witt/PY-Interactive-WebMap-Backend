@@ -53,8 +53,8 @@ class GeoReferencedMixin(models.Model):
     """
     Mixin for models that need geographic coordinates.
     """
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    latitude = models.FloatField(null=True,blank=True)
+    longitude = models.FloatField(null=True,blank=True)
     zoom_level = models.IntegerField(blank=True, null=True)
     show_on_map = models.BooleanField(default=False)
     group = models.ForeignKey(MapGroup, on_delete=models.DO_NOTHING, blank=True, null=True)
@@ -75,7 +75,6 @@ class MapStyle(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
         async_to_sync(channel_layer.group_send)("chat",
                                                 {"type": "model.update", "model_type": type(self), 'object': self})
-
 
 class MapOverlay(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -99,7 +98,22 @@ class NamedGeoReferencedItem(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoRefer
     """
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        async_to_sync(channel_layer.group_send)("chat",
+                                                {"type": "model.update", "model_type": type(self), 'object': self})
+
+class Unit(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models.Model):
+    """
+    Model representing a unit of measurement.
+    """
+    name = models.CharField(max_length=100, unique=True)
     symbol = models.JSONField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name

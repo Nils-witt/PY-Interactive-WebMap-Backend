@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from objects.models import MapOverlay, MapStyle, NamedGeoReferencedItem, MapGroup
+from objects.models import MapOverlay, MapStyle, NamedGeoReferencedItem, MapGroup, Unit
 
 
 class MapOverlaySerializerWS(serializers.HyperlinkedModelSerializer):
@@ -54,3 +54,14 @@ class NamedGeoReferencedItemSerializer(NamedGeoReferencedItemSerializerWS):
     class Meta:
         model = NamedGeoReferencedItem
         fields = NamedGeoReferencedItemSerializerWS.Meta.fields + ['url']
+
+class UnitWS(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Unit
+        fields = ['id', 'name', 'latitude', 'longitude', 'show_on_map', 'group', 'group_id',
+                  'symbol', 'created_at', 'updated_at', 'description']
+
+class UnitSerializer(UnitWS):
+    class Meta:
+        model = Unit
+        fields = UnitWS.Meta.fields + ['url']
