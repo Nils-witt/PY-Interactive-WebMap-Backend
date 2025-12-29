@@ -117,6 +117,10 @@ class MyConsumer(WebsocketConsumer):
                 instance.longitude = data['longitude']
             if 'description' in data.keys():
                 instance.description = data['description']
+            if 'unit_status' in data.keys():
+                instance.unit_status = data['unit_status']
+            if 'symbol' in data.keys():
+                instance.symbol = data['symbol']
             instance.save()
         else:
             self.send(text_data=json.dumps({
