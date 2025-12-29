@@ -45,6 +45,18 @@ class UnitStatus(UUIDMixIn, TimeStampMixIn, models.Model):
         return self.status.__str__()
 
 
+class UnitLocation(UUIDMixIn, TimeStampMixIn, models.Model):
+    """
+    Model representing the location history of a unit.
+    """
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    unit = models.ForeignKey('Unit', on_delete=models.CASCADE, related_name='location_history')
+
+    def __str__(self):
+        return f"Lat: {self.latitude}, Lon: {self.longitude}"
+
+
 class MapGroup(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
     """
     Base class for all map groups.
@@ -67,6 +79,7 @@ class GeoReferencedMixin(models.Model):
     """
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    location_timestamp = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -136,6 +149,8 @@ class Unit(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models
         super().__init__(*args, **kwargs)
         self.__unit_status_initial = self.unit_status
         self.__unit_status_timestamp = self.unit_status_timestamp
+        self.__latitude_initial = self.latitude
+        self.__longitude_initial = self.longitude
 
     def __str__(self):
         return self.name
@@ -143,11 +158,19 @@ class Unit(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models
     def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
         self.unit_status_timestamp = self.__unit_status_timestamp
         status_changed = self.unit_status != self.__unit_status_initial
+        location_changed = self.latitude != self.__latitude_initial or self.longitude != self.__longitude_initial
         if status_changed:
             self.unit_status_timestamp = now()
             self.__unit_status_initial = self.unit_status
+        if location_changed:
+            self.location_timestamp = now()
+            self.__latitude_initial = self.latitude
+            self.__longitude_initial = self.longitude
+
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
         if status_changed:
             UnitStatus.objects.create(status=self.unit_status, unit=self)
+        if location_changed:
+            UnitLocation.objects.create(latitude=self.latitude, longitude=self.longitude, unit=self)
         async_to_sync(channel_layer.group_send)("chat",
                                                 {"type": "model.update", "model_type": type(self), 'object': self})
