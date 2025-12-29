@@ -121,6 +121,8 @@ class MyConsumer(WebsocketConsumer):
                 instance.unit_status = data['unit_status']
             if 'symbol' in data.keys():
                 instance.symbol = data['symbol']
+            if 'route' in data.keys():
+                instance.route = data['route']
             instance.save()
         else:
             self.send(text_data=json.dumps({
