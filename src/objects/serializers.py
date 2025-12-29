@@ -58,7 +58,7 @@ class NamedGeoReferencedItemSerializer(NamedGeoReferencedItemSerializerWS):
 class UnitWS(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Unit
-        fields = ['id', 'name', 'latitude', 'longitude', 'unit_status', 'symbol', 'created_at', 'updated_at', 'description']
+        fields = ['id', 'name', 'latitude', 'longitude', 'unit_status','unit_status_timestamp','speak_request', 'symbol', 'created_at', 'updated_at', 'description']
 
 class UnitSerializer(UnitWS):
     class Meta:
