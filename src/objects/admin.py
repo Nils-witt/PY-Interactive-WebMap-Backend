@@ -1,11 +1,11 @@
+from django import forms
 from django.contrib import admin
+from django.contrib.admin.helpers import ActionForm
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
+from guardian.admin import GuardedModelAdmin
 
 from objects.models import MapGroup, MapOverlay, MapStyle, NamedGeoReferencedItem, Unit
-from django.contrib.admin.helpers import ActionForm
-from django import forms
-from guardian.admin import GuardedModelAdmin
 
 # Register your models here.
 
@@ -54,6 +54,7 @@ class MapStyleAdmin(GuardedModelAdmin):
 
 admin.site.register(MapStyle, MapStyleAdmin)
 
+
 class XForm(ActionForm):
     zoom_level = forms.IntegerField(required=False)
 
@@ -72,11 +73,15 @@ class NamedGeoReferencedItemAdmin(GuardedModelAdmin):
         if zoom_level is not None:
             queryset.update(zoom_level=zoom_level)
             self.message_user(request, f"Zoom level set to {zoom_level} for selected items.")
+
+
 admin.site.register(NamedGeoReferencedItem, NamedGeoReferencedItemAdmin)
 
+
 class UnitAdmin(GuardedModelAdmin):
-    list_display = ('name', 'longitude', 'latitude', 'created_at', 'updated_at')
+    list_display = ('name', 'unit_status', 'longitude', 'latitude', 'created_at', 'updated_at')
     search_fields = ('name',)
-    list_filter = ('created_at', 'updated_at')
+    list_filter = ('created_at', 'updated_at', 'unit_status')
+
 
 admin.site.register(Unit, UnitAdmin)

@@ -55,9 +55,6 @@ class GeoReferencedMixin(models.Model):
     """
     latitude = models.FloatField(null=True,blank=True)
     longitude = models.FloatField(null=True,blank=True)
-    zoom_level = models.IntegerField(blank=True, null=True)
-    show_on_map = models.BooleanField(default=False)
-    group = models.ForeignKey(MapGroup, on_delete=models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -98,6 +95,9 @@ class NamedGeoReferencedItem(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoRefer
     """
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
+    zoom_level = models.IntegerField(blank=True, null=True)
+    show_on_map = models.BooleanField(default=False)
+    group = models.ForeignKey(MapGroup, on_delete=models.DO_NOTHING, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -114,6 +114,7 @@ class Unit(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models
     name = models.CharField(max_length=100, unique=True)
     symbol = models.JSONField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    unit_status = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.name

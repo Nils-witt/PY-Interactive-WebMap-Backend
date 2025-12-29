@@ -48,7 +48,7 @@ class NamedGeoReferencedItemSerializerWS(serializers.HyperlinkedModelSerializer)
     class Meta:
         model = NamedGeoReferencedItem
         fields = ['id', 'name', 'latitude', 'longitude', 'zoom_level', 'show_on_map', 'group', 'group_id',
-                  'symbol', 'created_at', 'updated_at', 'description']
+                  'created_at', 'updated_at', 'description']
 
 class NamedGeoReferencedItemSerializer(NamedGeoReferencedItemSerializerWS):
     class Meta:
@@ -58,8 +58,7 @@ class NamedGeoReferencedItemSerializer(NamedGeoReferencedItemSerializerWS):
 class UnitWS(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Unit
-        fields = ['id', 'name', 'latitude', 'longitude', 'show_on_map', 'group', 'group_id',
-                  'symbol', 'created_at', 'updated_at', 'description']
+        fields = ['id', 'name', 'latitude', 'longitude', 'unit_status', 'symbol', 'created_at', 'updated_at', 'description']
 
 class UnitSerializer(UnitWS):
     class Meta:
