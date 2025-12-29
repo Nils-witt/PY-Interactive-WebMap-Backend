@@ -4,6 +4,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 
 channel_layer = get_channel_layer()
 
@@ -33,6 +34,17 @@ class OwnerShipMixIn(models.Model):
         abstract = True
 
 
+class UnitStatus(UUIDMixIn, TimeStampMixIn, models.Model):
+    """
+    Model representing the status of a unit.
+    """
+    status = models.IntegerField()
+    unit = models.ForeignKey('Unit', on_delete=models.CASCADE, related_name='status_history')
+
+    def __str__(self):
+        return self.status.__str__()
+
+
 class MapGroup(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
     """
     Base class for all map groups.
@@ -53,8 +65,8 @@ class GeoReferencedMixin(models.Model):
     """
     Mixin for models that need geographic coordinates.
     """
-    latitude = models.FloatField(null=True,blank=True)
-    longitude = models.FloatField(null=True,blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -72,6 +84,7 @@ class MapStyle(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
         async_to_sync(channel_layer.group_send)("chat",
                                                 {"type": "model.update", "model_type": type(self), 'object': self})
+
 
 class MapOverlay(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -107,6 +120,7 @@ class NamedGeoReferencedItem(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoRefer
         async_to_sync(channel_layer.group_send)("chat",
                                                 {"type": "model.update", "model_type": type(self), 'object': self})
 
+
 class Unit(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models.Model):
     """
     Model representing a unit of measurement.
@@ -115,11 +129,25 @@ class Unit(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models
     symbol = models.JSONField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     unit_status = models.IntegerField(blank=True, null=True)
+    unit_status_timestamp = models.DateTimeField(blank=True, null=True)
+    speak_request = models.BooleanField(default=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__unit_status_initial = self.unit_status
+        self.__unit_status_timestamp = self.unit_status_timestamp
 
     def __str__(self):
         return self.name
 
     def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.unit_status_timestamp = self.__unit_status_timestamp
+        status_changed = self.unit_status != self.__unit_status_initial
+        if status_changed:
+            self.unit_status_timestamp = now()
+            self.__unit_status_initial = self.unit_status
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        if status_changed:
+            UnitStatus.objects.create(status=self.unit_status, unit=self)
         async_to_sync(channel_layer.group_send)("chat",
                                                 {"type": "model.update", "model_type": type(self), 'object': self})

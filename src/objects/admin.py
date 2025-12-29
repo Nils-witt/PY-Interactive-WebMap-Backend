@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseRedirect
 from guardian.admin import GuardedModelAdmin
 
-from objects.models import MapGroup, MapOverlay, MapStyle, NamedGeoReferencedItem, Unit
+from objects.models import MapGroup, MapOverlay, MapStyle, NamedGeoReferencedItem, Unit, UnitStatus
 
 # Register your models here.
 
@@ -79,9 +79,14 @@ admin.site.register(NamedGeoReferencedItem, NamedGeoReferencedItemAdmin)
 
 
 class UnitAdmin(GuardedModelAdmin):
-    list_display = ('name', 'unit_status', 'longitude', 'latitude', 'created_at', 'updated_at')
+    list_display = ('name', 'unit_status','unit_status_timestamp', 'longitude', 'latitude', 'created_at', 'updated_at')
     search_fields = ('name',)
     list_filter = ('created_at', 'updated_at', 'unit_status')
 
 
 admin.site.register(Unit, UnitAdmin)
+
+
+class UnitStatusAdmin(GuardedModelAdmin):
+    list_display = ('status', 'unit', 'created_at')
+admin.site.register(UnitStatus, UnitStatusAdmin)
