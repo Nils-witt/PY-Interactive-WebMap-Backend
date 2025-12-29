@@ -70,7 +70,7 @@ class UnitWS(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Unit
         fields = ['id', 'name', 'latitude', 'longitude', 'unit_status', 'unit_status_timestamp', 'speak_request',
-                  'symbol', 'created_at', 'updated_at', 'description', 'location_timestamp']
+                  'symbol', 'created_at', 'updated_at', 'description', 'location_timestamp', 'route']
 
 
 class UnitSerializer(UnitWS):

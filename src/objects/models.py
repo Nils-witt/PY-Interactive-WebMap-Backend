@@ -144,6 +144,7 @@ class Unit(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models
     unit_status = models.IntegerField(blank=True, null=True)
     unit_status_timestamp = models.DateTimeField(blank=True, null=True)
     speak_request = models.BooleanField(default=False)
+    route = models.JSONField(blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
