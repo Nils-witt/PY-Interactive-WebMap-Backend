@@ -1,3 +1,4 @@
+from auditlog.mixins import AuditlogHistoryAdminMixin
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.helpers import ActionForm
@@ -87,6 +88,7 @@ class UnitAdmin(GuardedModelAdmin):
 admin.site.register(Unit, UnitAdmin)
 
 
-class UnitStatusAdmin(GuardedModelAdmin):
+class UnitStatusAdmin(AuditlogHistoryAdminMixin,GuardedModelAdmin):
+    show_auditlog_history_link = True
     list_display = ('status', 'unit', 'created_at')
 admin.site.register(UnitStatus, UnitStatusAdmin)

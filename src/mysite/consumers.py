@@ -1,6 +1,7 @@
 import json
 
 from asgiref.sync import async_to_sync
+from auditlog.context import set_actor
 from channels.generic.websocket import WebsocketConsumer
 from django.conf import settings
 
@@ -54,7 +55,8 @@ class MyConsumer(WebsocketConsumer):
                     'sender': 'system'
                 }))
             if command.lower() == 'model.update':
-                self.model_update_received(text_data_json.get('model', None), text_data_json.get('id', None), text_data_json.get('data', None))
+                with set_actor(self.user):
+                    self.model_update_received(text_data_json.get('model', None), text_data_json.get('id', None), text_data_json.get('data', None))
         except Exception as e:
             print(e)
             self.send(text_data=json.dumps({

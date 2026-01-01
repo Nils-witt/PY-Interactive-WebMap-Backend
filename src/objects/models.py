@@ -1,6 +1,7 @@
 import uuid
 
 from asgiref.sync import async_to_sync
+from auditlog.registry import auditlog
 from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import models
@@ -45,6 +46,9 @@ class UnitStatus(UUIDMixIn, TimeStampMixIn, models.Model):
         return self.status.__str__()
 
 
+auditlog.register(UnitStatus)
+
+
 class UnitLocation(UUIDMixIn, TimeStampMixIn, models.Model):
     """
     Model representing the location history of a unit.
@@ -55,6 +59,9 @@ class UnitLocation(UUIDMixIn, TimeStampMixIn, models.Model):
 
     def __str__(self):
         return f"Lat: {self.latitude}, Lon: {self.longitude}"
+
+
+auditlog.register(UnitLocation)
 
 
 class MapGroup(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
@@ -71,6 +78,9 @@ class MapGroup(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
         async_to_sync(channel_layer.group_send)("chat",
                                                 {"type": "model.update", "model_type": type(self), 'object': self})
+
+
+auditlog.register(MapGroup)
 
 
 class GeoReferencedMixin(models.Model):
@@ -99,6 +109,9 @@ class MapStyle(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
                                                 {"type": "model.update", "model_type": type(self), 'object': self})
 
 
+auditlog.register(MapStyle)
+
+
 class MapOverlay(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
@@ -113,6 +126,9 @@ class MapOverlay(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
         async_to_sync(channel_layer.group_send)("chat",
                                                 {"type": "model.update", "model_type": type(self), 'object': self})
+
+
+auditlog.register(MapOverlay)
 
 
 class NamedGeoReferencedItem(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models.Model):
@@ -132,6 +148,9 @@ class NamedGeoReferencedItem(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoRefer
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
         async_to_sync(channel_layer.group_send)("chat",
                                                 {"type": "model.update", "model_type": type(self), 'object': self})
+
+
+auditlog.register(NamedGeoReferencedItem)
 
 
 class Unit(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models.Model):
@@ -175,3 +194,6 @@ class Unit(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models
             UnitLocation.objects.create(latitude=self.latitude, longitude=self.longitude, unit=self)
         async_to_sync(channel_layer.group_send)("chat",
                                                 {"type": "model.update", "model_type": type(self), 'object': self})
+
+
+auditlog.register(Unit)
