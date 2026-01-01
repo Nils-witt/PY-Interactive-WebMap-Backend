@@ -11,7 +11,9 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'sdfshjdfoisdjfj9w03ur**``$("§U$)JFsdfshjd
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost 127.0.0.1').split(' ')
+print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
 CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost:3000').split(' ')
+print("CSRF_TRUSTED_ORIGINS:", CSRF_TRUSTED_ORIGINS)
 INSTALLED_APPS = []
 
 if DEBUG:
@@ -133,6 +135,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'False') == 'True'
+print("CSRF_COOKIE_SECURE:", CSRF_COOKIE_SECURE)
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
@@ -165,3 +168,5 @@ else:
             },
         },
     }
+
+print("CHANNEL_LAYERS:", CHANNEL_LAYERS)
