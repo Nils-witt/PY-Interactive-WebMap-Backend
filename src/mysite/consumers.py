@@ -69,25 +69,25 @@ class MyConsumer(WebsocketConsumer):
     def model_update(self, event):
         model = event["model_type"]
         model_type = None
-
+        instance = None
         if model == 'MapGroup':
             model_type = MapGroup
-            instance = MapGroupSerializerWS(MapGroup.objects.get(event['object_id']))
+            instance = MapGroupSerializerWS(MapGroup.objects.get(id=event['object_id']))
         elif model == 'MapStyle':
             model_type = MapStyle
             instance = MapStyleSerializerWS(MapStyle.objects.get(id=event['object_id']))
         elif model == 'MapOverlay':
             model_type = MapOverlay
-            instance = MapOverlaySerializerWS(MapOverlay.objects.get(event['object_id']))
+            instance = MapOverlaySerializerWS(MapOverlay.objects.get(id=event['object_id']))
         elif model == 'NamedGeoReferencedItem':
             model_type = NamedGeoReferencedItem
-            instance = NamedGeoReferencedItemSerializerWS(NamedGeoReferencedItem.objects.get(event['object_id']))
+            instance = NamedGeoReferencedItemSerializerWS(NamedGeoReferencedItem.objects.get(id=event['object_id']))
         elif model == 'Unit':
             model_type = Unit
-            instance = UnitWS(Unit.objects.get(event['object_id']))
-        else:
-            instance = {'error': 'Unknown model type'}
+            instance = UnitWS(Unit.objects.get(id=event['object_id']))
 
+        if instance is None:
+            return
         if model_type is None:
             return
         if self.user.has_perm(f'{model_type._meta.app_label}.view_{model_type._meta.model_name}'):

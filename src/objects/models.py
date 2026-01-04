@@ -182,15 +182,14 @@ class Unit(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models
 @receiver(models.signals.pre_save, sender=Unit)
 def unit_pre_save(sender, instance, **kwargs):
     if instance.pk:
-        previous = Unit.objects.get(pk=instance.pk)
-        if instance.unit_status != previous.unit_status:
-            instance.unit_status_timestamp = now()
-        else:
-            instance.unit_status_timestamp = previous.unit_status_timestamp
-        if instance.latitude != previous.latitude or instance.longitude != previous.longitude:
-            instance.location_timestamp = now()
-        else:
-            instance.location_timestamp = previous.location_timestamp
+        try:
+            previous = Unit.objects.get(pk=instance.pk)
+            if instance.unit_status != previous.unit_status:
+                instance.unit_status_timestamp = now()
+            if instance.latitude != previous.latitude or instance.longitude != previous.longitude:
+                instance.location_timestamp = now()
+        except:
+            pass
     else:
         instance.unit_status_timestamp = now()
         instance.location_timestamp = now()
