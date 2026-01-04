@@ -56,7 +56,8 @@ class MyConsumer(WebsocketConsumer):
                 }))
             if command.lower() == 'model.update':
                 with set_actor(self.user):
-                    self.model_update_received(text_data_json.get('model', None), text_data_json.get('id', None), text_data_json.get('data', None))
+                    self.model_update_received(text_data_json.get('model', None), text_data_json.get('id', None),
+                                               text_data_json.get('data', None))
         except Exception as e:
             print(e)
             self.send(text_data=json.dumps({
@@ -65,27 +66,34 @@ class MyConsumer(WebsocketConsumer):
                 'payload': text_data
             }))
 
-
     def model_update(self, event):
         model = event["model_type"]
-        if model == MapGroup:
-            instance = MapGroupSerializerWS(event['object'])
-        elif model == MapStyle:
-            instance = MapStyleSerializerWS(event['object'])
-        elif model == MapOverlay:
-            instance = MapOverlaySerializerWS(event['object'])
-        elif model == NamedGeoReferencedItem:
-            instance = NamedGeoReferencedItemSerializerWS(event['object'])
-        elif model == Unit:
-            instance = UnitWS(event['object'])
+        model_type = None
+
+        if model == 'MapGroup':
+            model_type = MapGroup
+            instance = MapGroupSerializerWS(MapGroup.objects.get(event['object_id']))
+        elif model == 'MapStyle':
+            model_type = MapStyle
+            instance = MapStyleSerializerWS(MapStyle.objects.get(id=event['object_id']))
+        elif model == 'MapOverlay':
+            model_type = MapOverlay
+            instance = MapOverlaySerializerWS(MapOverlay.objects.get(event['object_id']))
+        elif model == 'NamedGeoReferencedItem':
+            model_type = NamedGeoReferencedItem
+            instance = NamedGeoReferencedItemSerializerWS(NamedGeoReferencedItem.objects.get(event['object_id']))
+        elif model == 'Unit':
+            model_type = Unit
+            instance = UnitWS(Unit.objects.get(event['object_id']))
         else:
             instance = {'error': 'Unknown model type'}
 
-
-        if self.user.has_perm(f'{model._meta.app_label}.view_{model._meta.model_name}'):
+        if model_type is None:
+            return
+        if self.user.has_perm(f'{model_type._meta.app_label}.view_{model_type._meta.model_name}'):
             self.send(text_data=json.dumps({
                 'event': 'model.update',
-                'model_type': model.__name__,
+                'model_type': model,
                 'data': instance.data,
                 'sender': 'system'
             }))

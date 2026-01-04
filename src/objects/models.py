@@ -5,6 +5,7 @@ from auditlog.registry import auditlog
 from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import models
+from django.dispatch import receiver
 from django.utils.timezone import now
 
 channel_layer = get_channel_layer()
@@ -74,11 +75,11 @@ class MapGroup(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
-        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+@receiver([models.signals.post_save], sender=MapGroup)
+def map_group_change_notify(sender, instance, **kwargs):
+    if instance.pk:
         async_to_sync(channel_layer.group_send)("chat",
-                                                {"type": "model.update", "model_type": type(self), 'object': self})
-
+                                                {"type": "model.update", "model_type": type(instance), 'object_id': instance.pk})
 
 auditlog.register(MapGroup)
 
@@ -103,10 +104,11 @@ class MapStyle(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
-        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+@receiver([models.signals.post_save], sender=MapStyle)
+def map_style_change_notify(sender, instance, **kwargs):
+    if instance.pk:
         async_to_sync(channel_layer.group_send)("chat",
-                                                {"type": "model.update", "model_type": type(self), 'object': self})
+                                                {"type": "model.update", "model_type": "MapStyle", 'object_id': instance.pk.__str__()})
 
 
 auditlog.register(MapStyle)
@@ -122,10 +124,11 @@ class MapOverlay(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
-        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+@receiver([models.signals.post_save], sender=MapOverlay)
+def map_overlay_change_notify(sender, instance, **kwargs):
+    if instance.pk:
         async_to_sync(channel_layer.group_send)("chat",
-                                                {"type": "model.update", "model_type": type(self), 'object': self})
+                                                {"type": "model.update", "model_type": "MapOverlay", 'object_id': instance.pk.__str__()})
 
 
 auditlog.register(MapOverlay)
@@ -144,11 +147,11 @@ class NamedGeoReferencedItem(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoRefer
     def __str__(self):
         return self.name
 
-    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
-        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+@receiver([models.signals.post_save], sender=NamedGeoReferencedItem)
+def named_geo_referenced_item_change_notify(sender, instance, **kwargs):
+    if instance.pk:
         async_to_sync(channel_layer.group_send)("chat",
-                                                {"type": "model.update", "model_type": type(self), 'object': self})
-
+                                                {"type": "model.update", "model_type": "NamedGeoReferencedItem", 'object_id': instance.pk.__str__()})
 
 auditlog.register(NamedGeoReferencedItem)
 
@@ -175,25 +178,33 @@ class Unit(UUIDMixIn, TimeStampMixIn, OwnerShipMixIn, GeoReferencedMixin, models
     def __str__(self):
         return self.name
 
-    def save(self, *, force_insert=False, force_update=False, using=None, update_fields=None):
-        self.unit_status_timestamp = self.__unit_status_timestamp
-        status_changed = self.unit_status != self.__unit_status_initial
-        location_changed = self.latitude != self.__latitude_initial or self.longitude != self.__longitude_initial
-        if status_changed:
-            self.unit_status_timestamp = now()
-            self.__unit_status_initial = self.unit_status
-        if location_changed:
-            self.location_timestamp = now()
-            self.__latitude_initial = self.latitude
-            self.__longitude_initial = self.longitude
 
-        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
-        if status_changed:
-            UnitStatus.objects.create(status=self.unit_status, unit=self)
-        if location_changed:
-            UnitLocation.objects.create(latitude=self.latitude, longitude=self.longitude, unit=self)
-        async_to_sync(channel_layer.group_send)("chat",
-                                                {"type": "model.update", "model_type": type(self), 'object': self})
+@receiver(models.signals.pre_save, sender=Unit)
+def unit_pre_save(sender, instance, **kwargs):
+    if instance.pk:
+        previous = Unit.objects.get(pk=instance.pk)
+        if instance.unit_status != previous.unit_status:
+            instance.unit_status_timestamp = now()
+        else:
+            instance.unit_status_timestamp = previous.unit_status_timestamp
+        if instance.latitude != previous.latitude or instance.longitude != previous.longitude:
+            instance.location_timestamp = now()
+        else:
+            instance.location_timestamp = previous.location_timestamp
+    else:
+        instance.unit_status_timestamp = now()
+        instance.location_timestamp = now()
+
+@receiver(models.signals.post_save, sender=Unit)
+def unit_post_save(sender, instance, **kwargs):
+    if instance.pk:
+        previous = Unit.objects.get(pk=instance.pk)
+        if instance.unit_status != previous.unit_status:
+            UnitStatus.objects.create(status=instance.unit_status, unit=instance)
+        if instance.latitude != previous.latitude or instance.longitude != previous.longitude:
+            UnitLocation.objects.create(latitude=instance.latitude, longitude=instance.longitude, unit=instance)
+    async_to_sync(channel_layer.group_send)("chat",
+                                            {"type": "model.update", "model_type": "Unit", 'object_id': instance.pk.__str__()})
 
 
 auditlog.register(Unit)

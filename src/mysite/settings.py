@@ -153,7 +153,7 @@ SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "mysite.serializers.MyTokenObtainPairSerializer",
 }
 CHANNEL_LAYERS = {}
-if DEBUG:
+if not DEBUG:
     CHANNEL_LAYERS = {
         "default": {
             "BACKEND": "channels.layers.InMemoryChannelLayer"

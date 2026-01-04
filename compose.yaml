@@ -41,7 +41,11 @@ services:
       - django
     depends_on:
       - django
-
+  redis:
+    restart: unless-stopped
+    image: redis:8
+    ports:
+      - 6379:6379
 volumes:
   staticfiles:
 
