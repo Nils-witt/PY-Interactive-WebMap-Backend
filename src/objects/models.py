@@ -198,10 +198,14 @@ def unit_pre_save(sender, instance, **kwargs):
 @receiver(models.signals.post_save, sender=Unit)
 def unit_post_save(sender, instance, **kwargs):
     if instance.pk:
-        previous = Unit.objects.get(pk=instance.pk)
-        if instance.unit_status != previous.unit_status:
+        try:
+            previous = Unit.objects.get(pk=instance.pk)
+            if instance.unit_status != previous.unit_status:
+                UnitStatus.objects.create(status=instance.unit_status, unit=instance)
+            if instance.latitude != previous.latitude or instance.longitude != previous.longitude:
+                UnitLocation.objects.create(latitude=instance.latitude, longitude=instance.longitude, unit=instance)
+        except:
             UnitStatus.objects.create(status=instance.unit_status, unit=instance)
-        if instance.latitude != previous.latitude or instance.longitude != previous.longitude:
             UnitLocation.objects.create(latitude=instance.latitude, longitude=instance.longitude, unit=instance)
     async_to_sync(channel_layer.group_send)("chat",
                                             {"type": "model.update", "model_type": "Unit", 'object_id': instance.pk.__str__()})
