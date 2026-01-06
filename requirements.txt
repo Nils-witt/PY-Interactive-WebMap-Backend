@@ -8,3 +8,4 @@ channels==4.3.2
 daphne==4.2.1
 channels-redis==4.3.0
 django-auditlog==3.4.1
+sentry-sdk==2.48.0

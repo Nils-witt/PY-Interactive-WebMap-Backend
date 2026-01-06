@@ -1,14 +1,23 @@
 import os
 from datetime import timedelta
 from pathlib import Path
-
-from django.conf.global_settings import INSTALLED_APPS
+import sentry_sdk
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'sdfshjdfoisdjfj9w03ur**``$("§U$)JFsdfshjdfoisdjfj9w03ur**``$("§U$)JF')
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
+print("DEBUG:", DEBUG)
+
+if not DEBUG:
+    sentry_sdk.init(
+        dsn="https://341c3133f6ff917b974660e7e08c0139@o256272.ingest.us.sentry.io/4510663546896384",
+        send_default_pii=True,
+    )
+
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost 127.0.0.1').split(' ')
 print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
