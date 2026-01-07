@@ -14,7 +14,7 @@ admin.site.register(MapGroup)
 
 
 class MapOverlayAdmin(GuardedModelAdmin):
-    list_display = ('name', 'description', 'url', 'type')
+    list_display = ('name', 'description', 'file_directory', 'type')
     search_fields = ('name', 'description')
     list_filter = ('created_at', 'updated_at')
 

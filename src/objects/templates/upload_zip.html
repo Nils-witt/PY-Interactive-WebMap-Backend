@@ -1,0 +1,16 @@
+<html lang="en">
+<body>
+<h2>Upload Overlay (ZIP)</h2>
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+    <label>Overlay to associate
+        <select name="overlay_id">
+            {% for o in overlays %}
+            <option value="{{ o.id }}">{{ o.name }}</option>
+            {% endfor %}
+        </select>
+    </label><br/>
+    <label>ZIP file: <input type="file" name="zip" accept=".zip"></label><br/>
+    <input type="submit" value="Upload">
+</form>
+</body>
+</html>
